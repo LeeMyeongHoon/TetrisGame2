@@ -14,8 +14,8 @@ namespace TetrisGame2
 		public enum DrawOption { DEFAULT, EXPECTED, ERASE }
 
 		public const int BLOCK_SIZE = 26;
-		public const int MAX_BLOCK_DOWN_OFFSET = 1;
-		public const int MAX_BLOCK_UP_OFFSET = 2;
+		public const int MAX_BLOCK_DOWN_OFFSET = 1 * BLOCK_SIZE;
+		public const int MAX_BLOCK_UP_OFFSET = 2 * BLOCK_SIZE;
 		public const int BLOCK_COUNT = 4;
 		public const int FORM_COUNT = 4;
 
@@ -51,17 +51,17 @@ namespace TetrisGame2
 
 		static Shape()
 		{
-			#region InitRandomData()
+			#region InitRandomTypeData()
 
 			WEIGHT = new int[(int)Type.COUNT];
 
+			WEIGHT[(int)Type.S] = 2;
+			WEIGHT[(int)Type.Z] = 2;
 			WEIGHT[(int)Type.J] = 2;
 			WEIGHT[(int)Type.L] = 2;
-			WEIGHT[(int)Type.l] = 2;
+			WEIGHT[(int)Type.T] = 4;
 			WEIGHT[(int)Type.O] = 2;
-			WEIGHT[(int)Type.S] = 4;
-			WEIGHT[(int)Type.T] = 2;
-			WEIGHT[(int)Type.Z] = 5;
+			WEIGHT[(int)Type.l] = 5;
 
 			WEIGHT_SUM = new int[(int)Type.COUNT];
 
@@ -321,8 +321,8 @@ namespace TetrisGame2
 					pens = Pens.Black;
 				}
 
-				int x = PosX - GetBlockOffsetX(block);
-				int y = PosY - GetBlockOffsetY(block) - Shape.BLOCK_SIZE;
+				int x = PosX + GetBlockOffsetX(block);
+				int y = PosY + GetBlockOffsetY(block) - Shape.BLOCK_SIZE;
 
 				App.graphics.FillRectangle(brush, x, y, BLOCK_SIZE, BLOCK_SIZE);
 				App.graphics.DrawRectangle(Pens.Gray, x, y, BLOCK_SIZE, BLOCK_SIZE);
@@ -373,6 +373,6 @@ namespace TetrisGame2
 		}
 
 		private int GetBlockOffsetX(int block) => BLOCK_OFFSET_DATA[(int)type, form, block].x * BLOCK_SIZE;
-		private int GetBlockOffsetY(int block) => BLOCK_OFFSET_DATA[(int)type, form, block].y * BLOCK_SIZE;
+		private int GetBlockOffsetY(int block) => -BLOCK_OFFSET_DATA[(int)type, form, block].y * BLOCK_SIZE;
 	}
 }

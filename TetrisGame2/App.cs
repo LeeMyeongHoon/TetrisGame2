@@ -13,7 +13,7 @@ namespace TetrisGame2
 
 		public static Graphics graphics;
 
-		public static int ToPointX(int locX) => ORIGIN_X - locX;
+		public static int ToPointX(int locX) => ORIGIN_X + locX;
 		public static int ToPointY(int locY) => ORIGIN_Y - locY;
 		public static Point ToPoint(int locX, int locY) => new Point(ORIGIN_X - locX, ORIGIN_Y - locY);
 
