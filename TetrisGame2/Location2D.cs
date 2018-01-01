@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Drawing;
 
 namespace TetrisGame2
 {
-	public partial class App
+	class Location2D
 	{
-		public int MakePosOffset(int pos)
+		public int x;
+		public int y;
+
+		public Location2D()
 		{
-			return -pos;
+			x = 0;
+			y = 0;
+		}
+
+		public Location2D(int _x, int _y)
+		{
+			x = _x;
+			y = _y;
 		}
 	}
 }

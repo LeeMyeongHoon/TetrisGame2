@@ -59,7 +59,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.MidnightBlue;
-			this.ClientSize = new System.Drawing.Size(584, 686);
+			this.ClientSize = new System.Drawing.Size(586, 686);
 			this.Controls.Add(this.BTN_EXIT);
 			this.Controls.Add(this.BTN_START);
 			this.ForeColor = System.Drawing.SystemColors.Desktop;
@@ -75,4 +75,3 @@
 		private System.Windows.Forms.Button BTN_EXIT;
 	}
 }
-

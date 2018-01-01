@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
 
 namespace TetrisGame2
 {
-	public partial class App
+	public partial class App : Form
 	{
-		public Point MakePoint(int x, int y)
-		{
-			return new Point(originX - x, originY - y);
-		}
 	}
 }
