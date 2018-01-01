@@ -1,7 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System;
+using System.Threading;
 
 namespace TetrisGame2
 {
@@ -30,22 +31,37 @@ namespace TetrisGame2
 
 			Debug.Assert(WINDOW_WIDTH == ClientSize.Width && WINDOW_HEIGHT == ClientSize.Height, "사이즈 동기화 에러");
 
-			hasShape = false;
-			hasStack = false;
+			needDrawingObjects = false;
 			graphics = CreateGraphics();
 
 			shape = new Shape();
+			stack = new Stack();
+			mutex = new Mutex();
+		}
+
+
+		// protected
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			base.OnPaint(e);
+			if(needDrawingObjects)
+			{
+				DrawBackGround();
+				shape.Draw();
+			}
 		}
 
 
 		// private
-		Shape shape;
-
-		private bool hasStack;
-		private bool hasShape;
+		private bool needDrawingObjects;
 		private bool isFinished;
 
-		private static void DrawStackSpace()
+		private Shape shape;
+		private Stack stack;
+
+		private Mutex mutex;
+
+		private static void DrawBackGround()
 		{
 			Rectangle rect = new Rectangle(ToPointX(0), ToPointY(0) - Stack.VALID_HEIGHT, Stack.WIDTH, Stack.VALID_HEIGHT);
 			graphics.FillRectangle(Brushes.Black, rect);
@@ -53,8 +69,7 @@ namespace TetrisGame2
 
 		private void InitGameData()
 		{
-			hasStack = true;
-			hasShape = true;
+			needDrawingObjects = false;
 			isFinished = false;
 
 			shape.Reset();
@@ -66,7 +81,7 @@ namespace TetrisGame2
 			BTN_START.Hide();
 
 			InitGameData();
-			DrawStackSpace();
+			DrawBackGround();
 
 			shape.Draw();
 		}

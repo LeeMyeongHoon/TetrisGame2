@@ -35,7 +35,7 @@
 			// BTN_START
 			// 
 			this.BTN_START.Font = new System.Drawing.Font("휴먼편지체", 30F);
-			this.BTN_START.Location = new System.Drawing.Point(188, 164);
+			this.BTN_START.Location = new System.Drawing.Point(188, 153);
 			this.BTN_START.Name = "BTN_START";
 			this.BTN_START.Size = new System.Drawing.Size(191, 97);
 			this.BTN_START.TabIndex = 0;
@@ -46,7 +46,7 @@
 			// BTN_EXIT
 			// 
 			this.BTN_EXIT.Font = new System.Drawing.Font("휴먼편지체", 30F);
-			this.BTN_EXIT.Location = new System.Drawing.Point(188, 467);
+			this.BTN_EXIT.Location = new System.Drawing.Point(188, 423);
 			this.BTN_EXIT.Name = "BTN_EXIT";
 			this.BTN_EXIT.Size = new System.Drawing.Size(191, 97);
 			this.BTN_EXIT.TabIndex = 0;
@@ -58,6 +58,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackColor = System.Drawing.Color.MidnightBlue;
 			this.ClientSize = new System.Drawing.Size(586, 686);
 			this.Controls.Add(this.BTN_EXIT);
