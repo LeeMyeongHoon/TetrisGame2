@@ -7,6 +7,7 @@
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
 
+	
 		/// <summary>
 		/// 사용 중인 모든 리소스를 정리합니다.
 		/// </summary>
@@ -35,7 +36,7 @@
 			// BTN_START
 			// 
 			this.BTN_START.Font = new System.Drawing.Font("휴먼편지체", 30F);
-			this.BTN_START.Location = new System.Drawing.Point(188, 153);
+			this.BTN_START.Location = new System.Drawing.Point(326, 155);
 			this.BTN_START.Name = "BTN_START";
 			this.BTN_START.Size = new System.Drawing.Size(191, 97);
 			this.BTN_START.TabIndex = 0;
@@ -46,7 +47,7 @@
 			// BTN_EXIT
 			// 
 			this.BTN_EXIT.Font = new System.Drawing.Font("휴먼편지체", 30F);
-			this.BTN_EXIT.Location = new System.Drawing.Point(188, 423);
+			this.BTN_EXIT.Location = new System.Drawing.Point(326, 434);
 			this.BTN_EXIT.Name = "BTN_EXIT";
 			this.BTN_EXIT.Size = new System.Drawing.Size(191, 97);
 			this.BTN_EXIT.TabIndex = 0;
@@ -60,12 +61,12 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackColor = System.Drawing.Color.MidnightBlue;
-			this.ClientSize = new System.Drawing.Size(586, 686);
+			this.ClientSize = new System.Drawing.Size(826, 686);
 			this.Controls.Add(this.BTN_EXIT);
 			this.Controls.Add(this.BTN_START);
 			this.ForeColor = System.Drawing.SystemColors.Desktop;
 			this.Name = "App";
-			this.Text = "Form1";
+			this.Text = "TetrisGame by LeeMyeongHoon";
 			this.ResumeLayout(false);
 
 		}
