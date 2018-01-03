@@ -9,7 +9,6 @@ namespace TetrisGame2
 		/*******************************************************************************************************************/
 		//public static
 		public enum Type { S, Z, J, L, T, O, l, COUNT };
-		public enum DrawOption { Default, Expected, OnStack }
 
 		public const int BLOCK_SIZE = 26;
 		public const int MAX_BLOCK_DOWN_OFFSET = 1;
@@ -20,12 +19,10 @@ namespace TetrisGame2
 
 		/*******************************************************************************************************************/
 		// private static
-		private static readonly int[] WEIGHT;
 		private static readonly int[] WEIGHT_SUM;
 
 		private static readonly Location2D[,,] BLOCK_OFFSET_DATA; // Type,Form,Block
 
-		private static readonly Brush[] brushes;
 		private static Random randomForForm;
 		private static Random randomForType;
 
@@ -35,8 +32,7 @@ namespace TetrisGame2
 			randomForForm = new Random();
 			randomForType = new Random();
 
-
-			WEIGHT = new int[(int)Type.COUNT];
+			int[] WEIGHT = new int[(int)Type.COUNT];
 
 			WEIGHT[(int)Type.S] = 2;
 			WEIGHT[(int)Type.Z] = 2;
@@ -44,7 +40,7 @@ namespace TetrisGame2
 			WEIGHT[(int)Type.L] = 2;
 			WEIGHT[(int)Type.T] = 4;
 			WEIGHT[(int)Type.O] = 2;
-			WEIGHT[(int)Type.l] = 5;
+			WEIGHT[(int)Type.l] = 4;
 
 			WEIGHT_SUM = new int[(int)Type.COUNT];
 
@@ -243,32 +239,20 @@ namespace TetrisGame2
 			BLOCK_OFFSET_DATA[type, form, 3] = new Location2D(+1, -1);
 			#endregion
 
-			#region InitBrushData()
 
-			brushes = new Brush[(int)Type.COUNT];
-
-			brushes[(int)Type.J] = Brushes.Blue;
-			brushes[(int)Type.L] = Brushes.Orange;
-			brushes[(int)Type.l] = Brushes.Pink;
-			brushes[(int)Type.O] = Brushes.Yellow;
-			brushes[(int)Type.S] = Brushes.Red;
-			brushes[(int)Type.Z] = Brushes.GreenYellow;
-			brushes[(int)Type.T] = Brushes.Violet;
-
-			#endregion
 		}
 
-		private static int MakeRandomForm()
+		public static int MakeRandomForm()
 		{
 			return randomForForm.Next(0, FORM_COUNT);
 		}
-		private static Type MakeRandomType()
+		public static Type MakeRandomType()
 		{
-			var result = randomForType.Next(0, WEIGHT_SUM[(int)Type.COUNT - 1]);
+			var result = randomForType.Next(1, WEIGHT_SUM[(int)Type.COUNT - 1]);
 
 			for (int type = 0; type < (int)Type.COUNT; ++type)
 			{
-				if (result < WEIGHT_SUM[type])
+				if (result <= WEIGHT_SUM[type])
 				{
 					return (Type)type;
 				}
@@ -305,15 +289,10 @@ namespace TetrisGame2
 		}
 
 		public int Form { get => form; set => form = value; }
-		public int NextForm { get => nextForm; }
 		public Type Type_ { get => type; set => type = value; }
-		public Type NextType { get => nextType; }
-		public Brush BrushOnType { get => brushes[(int)type]; }
 
 		public Shape()
 		{
-			nextType = MakeRandomType();
-			nextForm = MakeRandomForm();
 			Reset();
 		}
 
@@ -323,22 +302,22 @@ namespace TetrisGame2
 			this.form = form;
 			this.locX = locX;
 			this.locY = locY;
-
-			nextType = MakeRandomType();
-			nextForm = MakeRandomForm();
 		}
+
 		public Shape(Shape other) : this(other.type, other.form, other.locX, other.locY) { }
 
 		public void Reset()
 		{
+			InitLocation();
+
+			type = MakeRandomType();
+			form = MakeRandomForm();
+		}
+
+		public void InitLocation()
+		{
 			locX = Stack.WIDTH / 2;
 			locY = Stack.VALID_HEIGHT + Shape.MAX_BLOCK_DOWN_OFFSET;
-
-			type = nextType;
-			form = nextForm;
-
-			nextType = MakeRandomType();
-			nextForm = MakeRandomForm();
 		}
 
 		public void Transform()
@@ -347,29 +326,6 @@ namespace TetrisGame2
 			if (form == FORM_COUNT)
 			{
 				form = 0;
-			}
-		}
-
-		public void Draw(DrawOption drawOption = DrawOption.Default)
-		{
-			for (int block = 0; block < BLOCK_COUNT; ++block)
-			{
-				if (drawOption == DrawOption.Default)
-				{
-					int x = GetBlockPosX(block);
-					int y = GetBlockPosY(block) - Shape.BLOCK_SIZE;
-
-					App.Graphics.FillRectangle(BrushOnType, x, y, BLOCK_SIZE, BLOCK_SIZE);
-					App.Graphics.DrawRectangle(Pens.Gray, x, y, BLOCK_SIZE, BLOCK_SIZE);
-
-				}
-				else // if (drawOption == DrawOption.EXPECTED)
-				{
-					int x = GetBlockPosX(block);
-					int y = GetBlockPosY(block) - Shape.BLOCK_SIZE;
-
-					App.Graphics.DrawRectangle(Pens.Gray, x, y, BLOCK_SIZE, BLOCK_SIZE);
-				}
 			}
 		}
 
@@ -383,18 +339,15 @@ namespace TetrisGame2
 		public int GetBlockLocX(int block) { return locX + BLOCK_OFFSET_DATA[(int)type, form, block].x; }
 		public int GetBlockLocY(int block) { return locY + BLOCK_OFFSET_DATA[(int)type, form, block].y; }
 
-		public int GetBlockPosX(int block) { return App.ToPointX(locX + BLOCK_OFFSET_DATA[(int)type, form, block].x); }
-		public int GetBlockPosY(int block) { return App.ToPointY(locY + BLOCK_OFFSET_DATA[(int)type, form, block].y); }
+		public int GetBlockPosX(int block) { return App.ToPointX(GetBlockLocX(block)); }
+		public int GetBlockPosY(int block) { return App.ToPointY(GetBlockLocY(block)); }
+
 
 		/*******************************************************************************************************************/
 		// private
 		private int locX;
 		private int locY;
 		private int form;
-		private int nextForm;
 		private Type type;
-		private Type nextType;
-
-
 	}
 }

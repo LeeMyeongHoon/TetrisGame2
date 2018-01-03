@@ -11,10 +11,10 @@
 			y = 0;
 		}
 
-		public Location2D(int _x, int _y)
+		public Location2D(int x, int y)
 		{
-			x = _x;
-			y = _y;
+			this.x = x;
+			this.y = y;
 		}
 	}
 }

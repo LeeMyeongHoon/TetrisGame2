@@ -6,7 +6,7 @@ namespace TetrisGame2
 		/*******************************************************************************************************************/
 		//public static
 		public const int WIDTH = 10;
-		public const int VALID_HEIGHT = 20;
+		public const int VALID_HEIGHT = 18;
 		public const int OVER_HEIGHT = VALID_HEIGHT + (Shape.MAX_BLOCK_UP_OFFSET + 3);
 
 
@@ -50,39 +50,16 @@ namespace TetrisGame2
 			}
 			highestBlockY--;
 		}
-		public void Draw(int beginY = 0)
-		{
-			for (int x = 0; x < WIDTH; x++)
-			{
-				for (int y = beginY; y <= highestBlockY; y++)
-				{
-					if (data[x, y] != null)
-					{
-						int posX = App.ToPointX(x);
-						int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
-						App.Graphics.FillRectangle(data[x, y], posX, posY, Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
-					}
-				}
-			}
-		}
-		public void Erase(int beginY, int lastY)
-		{
-			for (int y = beginY; y <= lastY; y++)
-			{
-				int posX = App.ToPointX(0);
-				int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
-				App.Graphics.FillRectangle(App.BackGroundBrush, posX, posY, Stack.WIDTH, Shape.BLOCK_SIZE);
-			}
-		}
+		
 
-		public void PushShape(Shape shape)
+		public void PushShape(Shape shape,Brush brushOfShape)
 		{
 			for (int blockNum = 0; blockNum < Shape.BLOCK_COUNT; blockNum++)
 			{
 				var locX = shape.GetBlockLocX(blockNum);
 				var locY = shape.GetBlockLocY(blockNum);
 
-				data[locX, locY] = shape.BrushOnType;
+				data[locX, locY] = brushOfShape;
 
 				if (locY > highestBlockY)
 				{
@@ -123,6 +100,5 @@ namespace TetrisGame2
 		//private
 		private int highestBlockY;
 		private Brush[,] data;       // 블럭이 없으면 null, 있으면 Brush 저장
-
 	}
 }
