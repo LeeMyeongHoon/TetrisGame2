@@ -12,7 +12,7 @@ namespace TetrisGame2
 		public const int ORIGIN_X = ((int)WindowSize.Width / 2 - Stack.WIDTH * Shape.BLOCK_SIZE / 2);
 		public const int ORIGIN_Y = (int)WindowSize.Height - 50;
 
-		public static readonly Brush BACKGROUND_BRUSH = Brushes.Black;
+		public static readonly Brush STACK_BACKGROUND_BRUSH = Brushes.Black;
 
 		/*******************************************************************************************************************/
 		// private static
@@ -527,7 +527,7 @@ namespace TetrisGame2
             {
                 int posX = App.ToPointX(0);
                 int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
-                graphics.FillRectangle(App.BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+                graphics.FillRectangle(App.STACK_BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
                 graphics.DrawRectangle(Pens.Black, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
             }
 
@@ -575,7 +575,7 @@ namespace TetrisGame2
 				}
 				else
 				{
-					graphics.FillRectangle(BACKGROUND_BRUSH, x, y, expectedBlockSize, expectedBlockSize);
+					graphics.FillRectangle(STACK_BACKGROUND_BRUSH, x, y, expectedBlockSize, expectedBlockSize);
 					graphics.DrawRectangle(Pens.Black, x, y, expectedBlockSize, expectedBlockSize);
 				}
 			}
@@ -590,7 +590,7 @@ namespace TetrisGame2
 			int posX = ToPointX(NEXT_SHAPE_X - 2);
 			int posY = ToPointY(NEXT_SHAPE_Y + 3);
 
-			graphics.FillRectangle(BACKGROUND_BRUSH, posX, posY, Shape.BLOCK_SIZE * 5 + 1, Shape.BLOCK_SIZE * 5);
+			graphics.FillRectangle(STACK_BACKGROUND_BRUSH, posX, posY, Shape.BLOCK_SIZE * 5 + 1, Shape.BLOCK_SIZE * 5);
 		}
 
 		private void DrawShape(Shape shape)
@@ -618,7 +618,7 @@ namespace TetrisGame2
 				}
 				else
 				{
-					graphics.FillRectangle(BACKGROUND_BRUSH, x, y, Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+					graphics.FillRectangle(STACK_BACKGROUND_BRUSH, x, y, Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
 					graphics.DrawRectangle(Pens.Black, x, y, Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
 				}
 			}
@@ -634,7 +634,7 @@ namespace TetrisGame2
 			int height = Stack.VALID_HEIGHT * Shape.BLOCK_SIZE + 1;
 
 			Rectangle rect = new Rectangle(posX, posY, width + 1, height);
-			g.FillRectangle(BACKGROUND_BRUSH, rect);
+			g.FillRectangle(STACK_BACKGROUND_BRUSH, rect);
 
 			g.Dispose();
 		}
