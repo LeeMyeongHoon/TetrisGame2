@@ -17,7 +17,7 @@ namespace TetrisGame2
 
 		/*******************************************************************************************************************/
 		//public
-		public int HighestBlockY { get => highestBlockY; }
+		public int HighestBlockY { get; private set; }
 
 		public Stack()
 		{
@@ -35,7 +35,7 @@ namespace TetrisGame2
 				}
 			}
 
-			highestBlockY = 0;
+			HighestBlockY = 0;
 		}
 
 		public void BreakRow(int keyY)
@@ -43,16 +43,16 @@ namespace TetrisGame2
 			// 1줄씩 아래로 당긴다.
 			for (int x = 0; x < WIDTH; x++)
 			{
-				for (int y = keyY; y < highestBlockY; y++)
+				for (int y = keyY; y < HighestBlockY; y++)
 				{
 					data[x, y] = data[x, y + 1];
 				}
-				data[x, highestBlockY] = null;
+				data[x, HighestBlockY] = null;
 			}
-			highestBlockY--;
+			HighestBlockY--;
 		}
 
-		public void PushShape(Shape shape,Brush brushOfShape)
+		public void PushShape(Shape shape, Brush brushOfShape)
 		{
 			for (int blockNum = 0; blockNum < Shape.BLOCK_COUNT; blockNum++)
 			{
@@ -61,14 +61,14 @@ namespace TetrisGame2
 
 				data[locX, locY] = brushOfShape;
 
-				if (locY > highestBlockY)
+				if (locY > HighestBlockY)
 				{
-					highestBlockY = locY;
+					HighestBlockY = locY;
 				}
 			}
 		}
 
-		public bool IsFull() { return highestBlockY >= VALID_HEIGHT; }
+		public bool IsFull() { return HighestBlockY >= VALID_HEIGHT; }
 
 		public bool IsFullLow(int y)
 		{
@@ -100,7 +100,6 @@ namespace TetrisGame2
 
 		/*******************************************************************************************************************/
 		//private
-		private int highestBlockY;
 		private Brush[,] data;       // 블럭이 없으면 null, 있으면 Brush 저장
 	}
 }

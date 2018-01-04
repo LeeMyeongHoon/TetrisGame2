@@ -145,7 +145,6 @@ namespace TetrisGame2
 
 		private static readonly Brush[] BRUSHES_ON_SHAPE;
 		private static readonly int BOUNDARY_POS_Y;
-
 		static App()
 		{
 			#region InitBrushData()
@@ -196,7 +195,7 @@ namespace TetrisGame2
 		{
 			InitializeComponent();
 			shouldDrawObjects = false;
-			this.FormClosed += AppExit;
+			this.FormClosed += AppExitHandler;
 			this.MaximizeBox = false;
 		}
 
@@ -231,6 +230,7 @@ namespace TetrisGame2
 		private Stack stack;
 
 		private Graphics graphics;
+
 		private void GameStart()
 		{
 			Initialize();
@@ -240,6 +240,20 @@ namespace TetrisGame2
 
 		private void Initialize()
 		{
+			#region HideBottons()
+
+			BTN_START.Enabled = false;
+			BTN_EXIT.Enabled = false;
+
+			BTN_START.Hide();
+			BTN_EXIT.Hide();
+
+			this.Focus();
+
+			#endregion
+
+			#region InitData()
+
 			curShape = new Shape();
 			expectedShape = new Shape();
 			nextShape = MakeNextShape();
@@ -250,27 +264,39 @@ namespace TetrisGame2
 			isGameOver = false;
 			shouldDrawObjects = true;
 
-			BTN_EXIT.Hide();
-			BTN_START.Hide();
+			#endregion
+
+			#region DrawObjects()
+
 			EraseUpperSpace();
 
 			DrawCurShape();
 			DrawExpectedShape();
 			DrawStackBackground();
 
-			this.KeyPreview = true;
-			this.KeyDown += HandleGameKey;
+			#endregion
 
-			HandleMoveDownShapeAutomacally();
+			ReceiveGameKey();
+
+			MoveDownShapeAutomacally();
 		}
 
-		private void HandleMoveDownShapeAutomacally()
+		private void ReceiveGameKey()
 		{
-			Timer shapeDownTimer = new Timer();
+			this.KeyPreview = true;
+			this.KeyDown += GameKeyHandler;
+		}
 
-			shapeDownTimer.Interval = 400;
 
-			shapeDownTimer.Tick += HandleGameDownKey;
+		
+		private void MoveDownShapeAutomacally()
+		{
+			Timer shapeDownTimer = new Timer
+			{
+				Interval = 400
+			};
+
+			shapeDownTimer.Tick += DownKeyHandler;
 
 			shapeDownTimer.Start();
 
@@ -280,7 +306,7 @@ namespace TetrisGame2
 			}
 			shapeDownTimer.Stop();
 
-			shapeDownTimer.Tick -= HandleGameDownKey;
+			shapeDownTimer.Tick -= DownKeyHandler;
 
 			shapeDownTimer.Dispose();
 		}
@@ -296,18 +322,24 @@ namespace TetrisGame2
 		private void FinishGame()
 		{
 			KeyPreview = false;
-			this.KeyDown -= HandleGameKey;
+			this.KeyDown -= GameKeyHandler;
+
 			MessageBox.Show("Game Over", "Game Over");
 
-			this.KeyPreview = false;
 			shouldDrawObjects = false;
 
 			EraseAll();
 
 			graphics.Dispose();
 
+			#region ShowButtons()
+
 			BTN_EXIT.Show();
 			BTN_START.Show();
+			BTN_START.Enabled = true;
+			BTN_EXIT.Enabled = true;
+
+			#endregion
 		}
 
 		private void SetExpectedShape()
@@ -420,7 +452,7 @@ namespace TetrisGame2
 			return new Shape(Shape.MakeRandomType(), Shape.MakeRandomForm(), NEXT_SHAPE_X, NEXT_SHAPE_Y);
 		}
 
-		private void HandleGameUpKey()
+		private void ProcGameUpKey()
 		{
 			EraseCurShape();
 			EraseExpecatedShape();
@@ -429,9 +461,11 @@ namespace TetrisGame2
 			DrawExpectedShape();
 		}
 
-		private void HandleGameSpaceKey()
+		private void ProcGameSpaceKey()
 		{
-			this.KeyDown -= HandleGameKey;
+			this.KeyPreview = false;
+			this.KeyDown -= GameKeyHandler;
+
 			while (CanMoveDownCurShape())
 			{
 				EraseCurShape();
@@ -439,11 +473,13 @@ namespace TetrisGame2
 				DrawCurShape();
 				Delay(5);
 			}
-			this.KeyDown += HandleGameKey;
 			PushCurShapeToStack();
+
+			this.KeyPreview = true;
+			this.KeyDown += GameKeyHandler;
 		}
 
-		private void HandleGameDownKey()
+		private void ProcGameDownKey()
 		{
 			if (CanMoveDownCurShape())
 			{
@@ -457,7 +493,7 @@ namespace TetrisGame2
 			}
 		}
 
-		private void HandleGameSideKey(Side side)
+		private void ProcGameSideKey(Side side)
 		{
 			if (CanMoveSideShape(side))
 			{
@@ -485,18 +521,17 @@ namespace TetrisGame2
 				}
 			}
 		}
-		private void EraseStack(int beginY, int lastY)
-		{
-			for (int y = beginY; y <= lastY; y++)
-			{
-				int posX = App.ToPointX(0);
-				int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
-				graphics.FillRectangle(App.BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
-				graphics.DrawRectangle(Pens.Black, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
-			}
+        private void EraseStack(int beginY, int lastY)
+        {
+            for (int y = beginY; y <= lastY; y++)
+            {
+                int posX = App.ToPointX(0);
+                int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
+                graphics.FillRectangle(App.BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+                graphics.DrawRectangle(Pens.Black, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+            }
 
-		}
-
+        }
 		private void DrawCurShape()
 		{
 			DrawShape(curShape);
@@ -624,38 +659,38 @@ namespace TetrisGame2
 			}
 		}
 
-		private void HandleGameKey(object sender, KeyEventArgs e)
+		private void GameKeyHandler(object sender, KeyEventArgs e)
 		{
 			switch (e.KeyCode)
 			{
 				case Keys.Up:
 					{
-						HandleGameUpKey();
+						ProcGameUpKey();
 						break;
 					}
 
 				case Keys.Down:
 					{
-						HandleGameDownKey();
+						ProcGameDownKey();
 						break;
 					}
 
 				case Keys.Left:
 					{
-						HandleGameSideKey(Side.Left);
+						ProcGameSideKey(Side.Left);
 						break;
 					}
 
 				case Keys.Right:
 					{
-						HandleGameSideKey(Side.Right);
+						ProcGameSideKey(Side.Right);
 						break;
 					}
 
 				case Keys.Space:
 					{
 						e.Handled = true;
-						HandleGameSpaceKey();
+						ProcGameSpaceKey();
 						break;
 					}
 
@@ -670,12 +705,12 @@ namespace TetrisGame2
 			}
 		}
 
-		private void HandleGameDownKey(object sender, EventArgs e)
+		private void DownKeyHandler(object sender, EventArgs e)
 		{
-			HandleGameDownKey();
+			ProcGameDownKey();
 		}
 
-		private void AppExit(object sender, FormClosedEventArgs e)
+		private void AppExitHandler(object sender, FormClosedEventArgs e)
 		{
 			isGameOver = true;
 			Application.Exit();

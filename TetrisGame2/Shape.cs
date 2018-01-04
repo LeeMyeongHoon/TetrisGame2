@@ -267,10 +267,13 @@ namespace TetrisGame2
 
 		/*******************************************************************************************************************/
 		// public 
-		public int PosX { get => App.ToPointX(locX); }
-		public int PosY { get => App.ToPointY(locY); }
-		public int LocX { get => locX; set => locX = value; }
-		public int LocY { get => locY; set => locY = value; }
+		public int PosX { get => App.ToPointX(LocX); }
+		public int PosY { get => App.ToPointY(LocY); }
+		public int LocX { get; set; }
+		public int LocY { get; set; }
+
+		public int Form { get; set; }
+		public Type Type_ { get; set; }
 
 		public int LowestBlockY
 		{
@@ -289,9 +292,6 @@ namespace TetrisGame2
 			}
 		}
 
-		public int Form { get => form; set => form = value; }
-		public Type Type_ { get => type; set => type = value; }
-
 		public Shape()
 		{
 			Reset();
@@ -299,45 +299,45 @@ namespace TetrisGame2
 
 		public Shape(Type type, int form, int locX, int locY)
 		{
-			this.type = type;
-			this.form = form;
-			this.locX = locX;
-			this.locY = locY;
+			this.Type_ = type;
+			this.Form = form;
+			this.LocX = locX;
+			this.LocY = locY;
 		}
 
-		public Shape(Shape other) : this(other.type, other.form, other.locX, other.locY) { }
+		public Shape(Shape other) : this(other.Type_, other.Form, other.LocX, other.LocY) { }
 
 		public void Reset()
 		{
 			InitLocation();
 
-			type = MakeRandomType();
-			form = MakeRandomForm();
+			Type_ = MakeRandomType();
+			Form = MakeRandomForm();
 		}
 
 		public void InitLocation()
 		{
-			locX = Stack.WIDTH / 2;
-			locY = Stack.VALID_HEIGHT + Shape.MAX_BLOCK_DOWN_OFFSET;
+			LocX = Stack.WIDTH / 2;
+			LocY = Stack.VALID_HEIGHT + Shape.MAX_BLOCK_DOWN_OFFSET;
 		}
 
 		public void Transform()
 		{
-			++form;
-			if (form == FORM_COUNT)
+			++Form;
+			if (Form == FORM_COUNT)
 			{
-				form = 0;
+				Form = 0;
 			}
 		}
 
-		public void MoveDown() { --locY; }
-		public void MoveRight(int offset = 1) { locX += offset; }
-		public void MoveLeft(int offset = 1) { locX -= offset; }
-		public void MoveSide(int offset) { locX += offset; }
-		public void MoveSide(Side side) { locX += (int)side; }
+		public void MoveDown() { --LocY; }
+		public void MoveRight(int offset = 1) { LocX += offset; }
+		public void MoveLeft(int offset = 1) { LocX -= offset; }
+		public void MoveSide(int offset) { LocX += offset; }
+		public void MoveSide(Side side) { LocX += (int)side; }
 
-		public int GetBlockLocX(int block) { return locX + BLOCK_OFFSET_DATA[(int)type, form, block].x; }
-		public int GetBlockLocY(int block) { return locY + BLOCK_OFFSET_DATA[(int)type, form, block].y; }
+		public int GetBlockLocX(int block) { return LocX + BLOCK_OFFSET_DATA[(int)Type_, Form, block].x; }
+		public int GetBlockLocY(int block) { return LocY + BLOCK_OFFSET_DATA[(int)Type_, Form, block].y; }
 
 		public int GetBlockPosX(int block) { return App.ToPointX(GetBlockLocX(block)); }
 		public int GetBlockPosY(int block) { return App.ToPointY(GetBlockLocY(block)); }
@@ -345,9 +345,5 @@ namespace TetrisGame2
 
 		/*******************************************************************************************************************/
 		// private
-		private int locX;
-		private int locY;
-		private int form;
-		private Type type;
 	}
 }
