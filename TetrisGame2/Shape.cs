@@ -246,6 +246,7 @@ namespace TetrisGame2
 		{
 			return randomForForm.Next(0, FORM_COUNT);
 		}
+
 		public static Type MakeRandomType()
 		{
 			var result = randomForType.Next(1, WEIGHT_SUM[(int)Type.COUNT - 1]);
@@ -334,7 +335,6 @@ namespace TetrisGame2
 		public void MoveLeft(int offset = 1) { locX -= offset; }
 		public void MoveSide(int offset) { locX += offset; }
 		public void MoveSide(Side side) { locX += (int)side; }
-
 
 		public int GetBlockLocX(int block) { return locX + BLOCK_OFFSET_DATA[(int)type, form, block].x; }
 		public int GetBlockLocY(int block) { return locY + BLOCK_OFFSET_DATA[(int)type, form, block].y; }

@@ -37,6 +37,7 @@ namespace TetrisGame2
 
 			highestBlockY = 0;
 		}
+
 		public void BreakRow(int keyY)
 		{
 			// 1줄씩 아래로 당긴다.
@@ -50,7 +51,6 @@ namespace TetrisGame2
 			}
 			highestBlockY--;
 		}
-		
 
 		public void PushShape(Shape shape,Brush brushOfShape)
 		{
@@ -69,6 +69,7 @@ namespace TetrisGame2
 		}
 
 		public bool IsFull() { return highestBlockY >= VALID_HEIGHT; }
+
 		public bool IsFullLow(int y)
 		{
 			for (int x = 0; x < Stack.WIDTH; x++)
@@ -80,6 +81,7 @@ namespace TetrisGame2
 			}
 			return true;
 		}
+
 		public int FindFullRow(int beginY, int lastY)
 		{
 			int y;
