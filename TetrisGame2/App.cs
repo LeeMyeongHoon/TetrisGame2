@@ -37,20 +37,20 @@ namespace TetrisGame2
 					return;
 				}
 
-				bool canTransform = true;
+				bool isSideOver = false;
 				for (int block = 0; block < Shape.BLOCK_COUNT; block++)
 				{
 					int blockX = app.curShape.GetBlockLocX(block);
 					if (blockX < 0)
 					{
-						canTransform = false;
+						isSideOver = true;
 						obstacleX = blockX;
 						moveDirection = Side.Right;
 						break;
 					}
 					else if (blockX >= Stack.WIDTH)
 					{
-						canTransform = false;
+						isSideOver = true;
 						obstacleX = blockX;
 						moveDirection = Side.Left;
 						break;
@@ -60,7 +60,7 @@ namespace TetrisGame2
 						int blockY = app.curShape.GetBlockLocY(block);
 						if (app.stack.GetData(blockX, blockY) != null)
 						{
-							canTransform = false;
+							isSideOver = true;
 							obstacleX = blockX;
 							moveDirection = obstacleX < app.curShape.LocX ? Side.Right : Side.Left;
 							break;
@@ -68,13 +68,14 @@ namespace TetrisGame2
 					}
 				}
 
-				if (!canTransform)
+				if (isSideOver)
 				{
+
 					Side obstacleSide = (Side)(-(int)moveDirection);
 					app.curShape.MoveSide(moveDirection);
 					while (IsShapeAttachedToObstacle(obstacleSide))
 					{
-						canTransform = true;
+						bool canTransform = true;
 						for (int blockNum = 0; blockNum < Shape.BLOCK_COUNT; blockNum++)
 						{
 							int blockX = app.curShape.GetBlockLocX(blockNum);
@@ -98,7 +99,7 @@ namespace TetrisGame2
 					app.curShape = oldShape; // move
 				}
 
-				else // if ( canTransform ) 
+				else // if ( !isSideOver ) 
 				{
 					return;
 				}
@@ -164,20 +165,6 @@ namespace TetrisGame2
 			BOUNDARY_POS_Y = ToPointY(Stack.VALID_HEIGHT);
 		}
 
-		private void DrawBackground()
-		{
-			Graphics g = CreateGraphics();
-
-			int posX = ToPointX(0) - 1;
-			int posY = ToPointY(0) - Stack.VALID_HEIGHT * Shape.BLOCK_SIZE;
-			int width = Stack.WIDTH * Shape.BLOCK_SIZE + 1;
-			int height = Stack.VALID_HEIGHT * Shape.BLOCK_SIZE + 1;
-
-			Rectangle rect = new Rectangle(posX, posY, width + 1, height);
-			g.FillRectangle(BACKGROUND_BRUSH, rect);
-
-			g.Dispose();
-		}
 
 		private static void Delay(int miliseconds)
 		{
@@ -202,13 +189,14 @@ namespace TetrisGame2
 		public static Point ToPoint(int locX, int locY) { return new Point(ToPointX(locX), ToPointY(locY)); }
 
 
+
 		/*******************************************************************************************************************/
 		// public
 		public App()
 		{
 			InitializeComponent();
 			shouldDrawObjects = false;
-			this.FormClosing += AppExit;
+			this.FormClosed += AppExit;
 			this.MaximizeBox = false;
 		}
 
@@ -223,7 +211,7 @@ namespace TetrisGame2
 			{
 				EraseNextShape(); // 검은색 공간 채우는 목적
 				DrawNextShape();
-				DrawBackground();
+				DrawStackBackground();
 
 				DrawStack();
 				DrawCurShape();
@@ -243,59 +231,58 @@ namespace TetrisGame2
 		private Stack stack;
 
 		private Graphics graphics;
-		private Timer aTimer;
-
 		private void GameStart()
 		{
 			Initialize();
 
-			MoveDownShapeAutomacally();
-			
 			FinishGame();
 		}
 
-		private void MoveDownShapeAutomacally()
-		{
-			aTimer = new Timer();
-			aTimer.Interval = 400;
-			aTimer.Tick += AutoMoveDownShape;
-			aTimer.Start();
-			while (!isGameOver)
-			{
-				Application.DoEvents();
-			}
-			aTimer.Stop();
-			aTimer.Dispose();
-		}
-
-		private void AutoMoveDownShape(object sender, EventArgs e)
-		{
-			HandleGameDownKey();
-		}
-
-
-
 		private void Initialize()
 		{
-			BTN_EXIT.Hide();
-			BTN_START.Hide();
-			graphics = CreateGraphics();
-
-			isGameOver = false;
-			shouldDrawObjects = true;
-
 			curShape = new Shape();
 			expectedShape = new Shape();
 			nextShape = MakeNextShape();
 			stack = new Stack();
 
+			graphics = CreateGraphics();
 
+			isGameOver = false;
+			shouldDrawObjects = true;
+
+			BTN_EXIT.Hide();
+			BTN_START.Hide();
 			EraseUpperSpace();
-			
-			DrawBackground();
+
+			DrawCurShape();
+			DrawExpectedShape();
+			DrawStackBackground();
 
 			this.KeyPreview = true;
-			this.KeyDown += new KeyEventHandler(HandleGameKey);
+			this.KeyDown += HandleGameKey;
+
+			HandleMoveDownShapeAutomacally();
+		}
+
+		private void HandleMoveDownShapeAutomacally()
+		{
+			Timer shapeDownTimer = new Timer();
+
+			shapeDownTimer.Interval = 400;
+
+			shapeDownTimer.Tick += HandleGameDownKey;
+
+			shapeDownTimer.Start();
+
+			while (!isGameOver)
+			{
+				Application.DoEvents();
+			}
+			shapeDownTimer.Stop();
+
+			shapeDownTimer.Tick -= HandleGameDownKey;
+
+			shapeDownTimer.Dispose();
 		}
 
 		private void EraseUpperSpace()
@@ -308,9 +295,10 @@ namespace TetrisGame2
 
 		private void FinishGame()
 		{
+			KeyPreview = false;
+			this.KeyDown -= HandleGameKey;
 			MessageBox.Show("Game Over", "Game Over");
 
-			this.KeyDown -= HandleGameKey;
 			this.KeyPreview = false;
 			shouldDrawObjects = false;
 
@@ -379,7 +367,6 @@ namespace TetrisGame2
 				return;
 			}
 
-
 			curShape = nextShape;
 			curShape.InitLocation();
 			DrawCurShape();
@@ -389,6 +376,7 @@ namespace TetrisGame2
 			DrawNextShape();
 
 			SetExpectedShape();
+			DrawExpectedShape();
 		}
 
 		private bool CanMoveSideShape(Side sideOffset)
@@ -408,7 +396,7 @@ namespace TetrisGame2
 			return true;
 		}
 
-		private bool CanMoveDownShape()
+		private bool CanMoveDownCurShape()
 		{
 			return CanMoveDownShape(curShape);
 		}
@@ -427,67 +415,6 @@ namespace TetrisGame2
 			return true;
 		}
 
-		private void BTN_START_Click(object sender, EventArgs e)
-		{
-			GameStart();
-		}
-
-		private void BTN_EXIT_Click(object sender, EventArgs e)
-		{
-			var result = MessageBox.Show("프로그램을 종료하시겠습니다?", BTN_EXIT.Text, MessageBoxButtons.OKCancel);
-
-			if (result == DialogResult.OK)
-			{
-				Application.Exit();
-			}
-		}
-
-		private void HandleGameKey(object sender, KeyEventArgs e)
-		{
-			switch (e.KeyCode)
-			{
-				case Keys.Up:
-					{
-						HandleGameUpKey();
-						break;
-					}
-
-				case Keys.Down:
-					{
-						HandleGameDownKey();
-						break;
-					}
-
-				case Keys.Left:
-					{
-						HandleGameSideKey(Side.Left);
-						break;
-					}
-
-				case Keys.Right:
-					{
-						HandleGameSideKey(Side.Right);
-						break;
-					}
-
-				case Keys.Space:
-					{
-						e.Handled = true;
-						HandleGameSpaceKey();
-						break;
-					}
-
-				case Keys.P:
-					{
-						MessageBox.Show("PAUSE", "PAUSE");
-						break;
-					}
-
-				default:
-					break;
-			}
-		}
-
 		private void HandleGameUpKey()
 		{
 			EraseCurShape();
@@ -499,16 +426,21 @@ namespace TetrisGame2
 
 		private void HandleGameSpaceKey()
 		{
-			EraseCurShape();
-			curShape = expectedShape;
-			DrawCurShape();
+			this.KeyDown -= HandleGameKey;
+			while (CanMoveDownCurShape())
+			{
+				EraseCurShape();
+				curShape.MoveDown();
+				DrawCurShape();
+				Delay(5);
+			}
+			this.KeyDown += HandleGameKey;
 			PushCurShapeToStack();
-			DrawExpectedShape();
 		}
 
 		private void HandleGameDownKey()
 		{
-			if (CanMoveDownShape())
+			if (CanMoveDownCurShape())
 			{
 				EraseCurShape();
 				curShape.MoveDown();
@@ -530,11 +462,6 @@ namespace TetrisGame2
 				DrawCurShape();
 				DrawExpectedShape();
 			}
-		}
-
-		private void AppExit(object sender, FormClosingEventArgs e)
-		{
-			Application.Exit();
 		}
 
 		private void DrawStack(int beginY = 0)
@@ -631,6 +558,7 @@ namespace TetrisGame2
 			return new Shape(Shape.MakeRandomType(), Shape.MakeRandomForm(), NEXT_SHAPE_X, NEXT_SHAPE_Y);
 		}
 
+
 		private void DrawShape(Shape shape)
 		{
 			for (int block = 0; block < Shape.BLOCK_COUNT; ++block)
@@ -662,9 +590,96 @@ namespace TetrisGame2
 			}
 		}
 
+		private void DrawStackBackground()
+		{
+			Graphics g = CreateGraphics();
+
+			int posX = ToPointX(0) - 1;
+			int posY = ToPointY(0) - Stack.VALID_HEIGHT * Shape.BLOCK_SIZE;
+			int width = Stack.WIDTH * Shape.BLOCK_SIZE + 1;
+			int height = Stack.VALID_HEIGHT * Shape.BLOCK_SIZE + 1;
+
+			Rectangle rect = new Rectangle(posX, posY, width + 1, height);
+			g.FillRectangle(BACKGROUND_BRUSH, rect);
+
+			g.Dispose();
+		}
+
 		private void EraseAll()
 		{
-			graphics.FillRectangle(Brushes.MidnightBlue, 0, 0, (int)WindowSize.Width, (int)WindowSize.Height);
+			graphics.FillRectangle(Brushes.MidnightBlue, 0, 0, (int)WindowSize.Width - 1, (int)WindowSize.Height - 1);
+		}
+
+		private void BTN_START_Click(object sender, EventArgs e)
+		{
+			GameStart();
+		}
+
+		private void BTN_EXIT_Click(object sender, EventArgs e)
+		{
+			var result = MessageBox.Show("프로그램을 종료하시겠습니다?", BTN_EXIT.Text, MessageBoxButtons.OKCancel);
+
+			if (result == DialogResult.OK)
+			{
+				Application.Exit();
+			}
+		}
+
+		private void HandleGameKey(object sender, KeyEventArgs e)
+		{
+			switch (e.KeyCode)
+			{
+				case Keys.Up:
+					{
+						HandleGameUpKey();
+						break;
+					}
+
+				case Keys.Down:
+					{
+						HandleGameDownKey();
+						break;
+					}
+
+				case Keys.Left:
+					{
+						HandleGameSideKey(Side.Left);
+						break;
+					}
+
+				case Keys.Right:
+					{
+						HandleGameSideKey(Side.Right);
+						break;
+					}
+
+				case Keys.Space:
+					{
+						e.Handled = true;
+						HandleGameSpaceKey();
+						break;
+					}
+
+				case Keys.P:
+					{
+						MessageBox.Show("PAUSE", "PAUSE");
+						break;
+					}
+
+				default:
+					break;
+			}
+		}
+
+		private void HandleGameDownKey(object sender, EventArgs e)
+		{
+			HandleGameDownKey();
+		}
+
+		private void AppExit(object sender, FormClosedEventArgs e)
+		{
+			isGameOver = true;
+			Application.Exit();
 		}
 	}
 }
