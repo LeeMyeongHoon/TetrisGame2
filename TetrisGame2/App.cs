@@ -415,6 +415,11 @@ namespace TetrisGame2
 			return true;
 		}
 
+		private Shape MakeNextShape()
+		{
+			return new Shape(Shape.MakeRandomType(), Shape.MakeRandomForm(), NEXT_SHAPE_X, NEXT_SHAPE_Y);
+		}
+
 		private void HandleGameUpKey()
 		{
 			EraseCurShape();
@@ -552,12 +557,6 @@ namespace TetrisGame2
 
 			graphics.FillRectangle(BACKGROUND_BRUSH, posX, posY, Shape.BLOCK_SIZE * 5 + 1, Shape.BLOCK_SIZE * 5);
 		}
-
-		private Shape MakeNextShape()
-		{
-			return new Shape(Shape.MakeRandomType(), Shape.MakeRandomForm(), NEXT_SHAPE_X, NEXT_SHAPE_Y);
-		}
-
 
 		private void DrawShape(Shape shape)
 		{
