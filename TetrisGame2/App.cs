@@ -152,13 +152,13 @@ namespace TetrisGame2
 
 			BRUSHES_ON_SHAPE = new Brush[(int)Shape.Type.COUNT];
 
-			BRUSHES_ON_SHAPE[(int)Shape.Type.J] = Brushes.Blue;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.J] = Brushes.Red;
 			BRUSHES_ON_SHAPE[(int)Shape.Type.L] = Brushes.Orange;
-			BRUSHES_ON_SHAPE[(int)Shape.Type.l] = Brushes.Beige;
-			BRUSHES_ON_SHAPE[(int)Shape.Type.O] = Brushes.Yellow;
-			BRUSHES_ON_SHAPE[(int)Shape.Type.S] = Brushes.Red;
-			BRUSHES_ON_SHAPE[(int)Shape.Type.Z] = Brushes.GreenYellow;
-			BRUSHES_ON_SHAPE[(int)Shape.Type.T] = Brushes.Violet;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.l] = Brushes.Yellow;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.O] = Brushes.LightGreen;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.S] = Brushes.LightBlue;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.Z] = Brushes.LightPink;
+			BRUSHES_ON_SHAPE[(int)Shape.Type.T] = Brushes.Blue;
 
 			#endregion
 
