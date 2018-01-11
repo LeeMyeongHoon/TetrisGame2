@@ -70,7 +70,6 @@ namespace TetrisGame2
 
 				if (isSideOver)
 				{
-
 					Side obstacleSide = (Side)(-(int)moveDirection);
 					app.curShape.MoveSide(moveDirection);
 					while (IsShapeAttachedToObstacle(obstacleSide))
@@ -145,6 +144,7 @@ namespace TetrisGame2
 
 		private static readonly Brush[] BRUSHES_ON_SHAPE;
 		private static readonly int BOUNDARY_POS_Y;
+
 		static App()
 		{
 			#region InitBrushData()
@@ -163,7 +163,6 @@ namespace TetrisGame2
 
 			BOUNDARY_POS_Y = ToPointY(Stack.VALID_HEIGHT);
 		}
-
 
 		private static void Delay(int miliseconds)
 		{
@@ -197,6 +196,7 @@ namespace TetrisGame2
 			shouldDrawObjects = false;
 			this.FormClosed += AppExitHandler;
 			this.MaximizeBox = false;
+			isGameKeyAct = false;
 		}
 
 
@@ -222,12 +222,15 @@ namespace TetrisGame2
 		/*******************************************************************************************************************/
 		// private
 		private bool isGameOver;
+		private bool isGameKeyAct;
 		private bool shouldDrawObjects;
 
 		private Shape curShape;
 		private Shape expectedShape;
 		private Shape nextShape;
 		private Stack stack;
+
+		private Timer shapeDownTimer;
 
 		private Graphics graphics;
 
@@ -283,15 +286,14 @@ namespace TetrisGame2
 
 		private void ReceiveGameKey()
 		{
+			isGameKeyAct = true;
 			this.KeyPreview = true;
 			this.KeyDown += GameKeyHandler;
 		}
 
-
-		
 		private void MoveDownShapeAutomacally()
 		{
-			Timer shapeDownTimer = new Timer
+			shapeDownTimer = new Timer
 			{
 				Interval = 400
 			};
@@ -407,7 +409,6 @@ namespace TetrisGame2
 			nextShape = MakeNextShape();
 			DrawNextShape();
 
-			SetExpectedShape();
 			DrawExpectedShape();
 		}
 
@@ -457,26 +458,27 @@ namespace TetrisGame2
 			EraseCurShape();
 			EraseExpecatedShape();
 			new TransformHandler(this).Do();
-			DrawCurShape();
 			DrawExpectedShape();
+			DrawCurShape();
 		}
 
 		private void ProcGameSpaceKey()
 		{
-			this.KeyPreview = false;
-			this.KeyDown -= GameKeyHandler;
+			isGameKeyAct = false;
+			shapeDownTimer.Stop();
 
-			while (CanMoveDownCurShape())
+			while (curShape.LocY != expectedShape.LocY)
 			{
 				EraseCurShape();
 				curShape.MoveDown();
 				DrawCurShape();
 				Delay(5);
 			}
+
 			PushCurShapeToStack();
 
-			this.KeyPreview = true;
-			this.KeyDown += GameKeyHandler;
+			isGameKeyAct = true;
+			shapeDownTimer.Start();
 		}
 
 		private void ProcGameDownKey()
@@ -500,8 +502,8 @@ namespace TetrisGame2
 				EraseExpecatedShape();
 				EraseCurShape();
 				curShape.MoveSide(side);
-				DrawCurShape();
 				DrawExpectedShape();
+				DrawCurShape();
 			}
 		}
 
@@ -521,17 +523,17 @@ namespace TetrisGame2
 				}
 			}
 		}
-        private void EraseStack(int beginY, int lastY)
-        {
-            for (int y = beginY; y <= lastY; y++)
-            {
-                int posX = App.ToPointX(0);
-                int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
-                graphics.FillRectangle(App.STACK_BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
-                graphics.DrawRectangle(Pens.Black, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
-            }
+		private void EraseStack(int beginY, int lastY)
+		{
+			for (int y = beginY; y <= lastY; y++)
+			{
+				int posX = App.ToPointX(0);
+				int posY = App.ToPointY(y) - Shape.BLOCK_SIZE;
+				graphics.FillRectangle(App.STACK_BACKGROUND_BRUSH, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+				graphics.DrawRectangle(Pens.Black, posX, posY, Stack.WIDTH * Shape.BLOCK_SIZE, Shape.BLOCK_SIZE);
+			}
 
-        }
+		}
 		private void DrawCurShape()
 		{
 			DrawShape(curShape);
@@ -545,7 +547,7 @@ namespace TetrisGame2
 		{
 			SetExpectedShape();
 
-			int offset = 1;
+			const int offset = 1;
 
 			for (int block = 0; block < Shape.BLOCK_COUNT; ++block)
 			{
@@ -661,47 +663,52 @@ namespace TetrisGame2
 
 		private void GameKeyHandler(object sender, KeyEventArgs e)
 		{
-			switch (e.KeyCode)
+			if (isGameKeyAct)
 			{
-				case Keys.Up:
-					{
-						ProcGameUpKey();
-						break;
-					}
+				switch (e.KeyCode)
+				{
+					case Keys.Up:
+						{
+							ProcGameUpKey();
+							break;
+						}
 
-				case Keys.Down:
-					{
-						ProcGameDownKey();
-						break;
-					}
+					case Keys.Down:
+						{
+							ProcGameDownKey();
+							break;
+						}
 
-				case Keys.Left:
-					{
-						ProcGameSideKey(Side.Left);
-						break;
-					}
+					case Keys.Left:
+						{
+							ProcGameSideKey(Side.Left);
+							break;
+						}
 
-				case Keys.Right:
-					{
-						ProcGameSideKey(Side.Right);
-						break;
-					}
+					case Keys.Right:
+						{
+							ProcGameSideKey(Side.Right);
+							break;
+						}
 
-				case Keys.Space:
-					{
-						e.Handled = true;
-						ProcGameSpaceKey();
-						break;
-					}
+					case Keys.Space:
+						{
+							e.Handled = true;
+							ProcGameSpaceKey();
+							break;
+						}
 
-				case Keys.P:
-					{
-						MessageBox.Show("PAUSE", "PAUSE");
-						break;
-					}
+					case Keys.P:
+						{
+							shapeDownTimer.Stop();
+							MessageBox.Show("PAUSE", "PAUSE");
+							shapeDownTimer.Start();
+							break;
+						}
 
-				default:
-					break;
+					default:
+						break;
+				}
 			}
 		}
 
